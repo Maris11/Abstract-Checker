@@ -1,7 +1,7 @@
 import csv
 
 rows = [
-    ['id', 'title', 'abstract_latvian', 'abstract_foreign', 'is_generated']
+    ['id', 'title', 'abstract_latvian', 'is_generated']
 ]
 
 with open('../abstracts.csv', 'w') as csvfile:
