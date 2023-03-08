@@ -7,7 +7,7 @@ from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
 abstracts = pd.read_csv(
-    "abstracts.csv",
+    "abstracts_test.csv",
     delimiter=',',
     encoding='utf-8',
     header=0
@@ -85,20 +85,21 @@ false_count = 0
 for text, generated in test_loader:
     out = model(text)
 
-    is_rec_correct = torch.round(out[0])[0] == generated[0]
+    is_correct = torch.round(out[0])[0] == generated[0]
 
     if generated[0] == 1:
         true_count = true_count + 1
     else:
         false_count = false_count + 1
 
-    if is_rec_correct:
+    if is_correct:
         if generated[0] == 1:
             correct_true = correct_true + 1
         else:
             correct_false = correct_false + 1
 
-print("True Precision: {:.1f}%\nFalse Precision: {:.1f}%".format(
+print("True Precision: {:.1f}%\nFalse Precision: {:.1f}%\nOverall precision: {:.1f}%".format(
     correct_true / true_count * 100,
     correct_false / false_count * 100,
+    correct_false + correct_true / len(test_loader)
 ))

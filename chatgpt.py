@@ -9,7 +9,7 @@ titles = []
 rows = list(reader)
 row_id = int(rows[-1][0]) + 1
 
-for i in range(300, 400):
+for i in range(405, 500):
     titles.append(rows[i][1])
 
 file.close()
