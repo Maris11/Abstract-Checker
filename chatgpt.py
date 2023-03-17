@@ -3,7 +3,7 @@ import csv
 
 ai = ChatGPT()
 ai.refresh_session()
-file = open('abstracts.csv', 'r', encoding='utf-8')
+file = open('cs_abstracts_real.csv', 'r', encoding='utf-8')
 reader = csv.reader(file)
 titles = []
 rows = list(reader)
@@ -13,7 +13,7 @@ for i in range(405, 500):
     titles.append(rows[i][1])
 
 file.close()
-file = open('abstracts.csv', 'a', encoding='utf-8', newline='')
+file = open('cs_abstracts_real.csv', 'a', encoding='utf-8', newline='')
 writer = csv.writer(file)
 
 for title in titles:
