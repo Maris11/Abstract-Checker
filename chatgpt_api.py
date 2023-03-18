@@ -8,7 +8,7 @@ file = open('abstracts/bme_abstracts_real.csv', 'r', encoding='utf-8')
 reader = csv.reader(file)
 titles = []
 rows = list(reader)
-row_id = 253
+row_id = 1421
 
 for i in range(row_id - 1, 1902):
     titles.append(rows[i][1])
@@ -26,7 +26,8 @@ for title in titles:
              "content": "Tu ģenerē anotācijas pētnieciskajiem darbiem no to nosaukuma. Līdz 850 rakstzīmēm. "
                         "Izmantot tagadnes formu. Anotācijas sākumu izvēlies kā random darba veidu (bakalaura, "
                         "maģistra, kursa, dilpomdarbs vai citu) vai vispār to nemini un izvēlies random sākuma "
-                        "formātu. Nerakstīt tekstā, ka tā ir anotācija."},
+                        "formātu. Nerakstīt tekstā, ka tā ir anotācija. Nerakstīt darba tēmu. Rakstīt tikai vienīgi "
+                        "anotāciju."},
             {"role": "user",
              "content": "Nosaukums \"" + title + "\""}
         ]

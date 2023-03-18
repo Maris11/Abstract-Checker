@@ -6,12 +6,23 @@ from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
-abstracts = pd.read_csv(
-    "abstracts_test.csv",
+real = pd.read_csv(
+    "abstracts/bme_abstracts_real.csv",
     delimiter=',',
     encoding='utf-8',
-    header=0
+    header=0,
+    usecols=['abstract', 'is_generated']
 )
+
+generated = pd.read_csv(
+    "abstracts/bme_abstracts_generated.csv",
+    delimiter=',',
+    encoding='utf-8',
+    header=0,
+    usecols=['abstract', 'is_generated']
+)
+
+abstracts = pd.concat([real, generated], axis=0, ignore_index=True)
 abstracts = abstracts.fillna("")  # nomaina tukšās vērtības ar tukšu string
 abstracts.abstract = abstracts.abstract.str.replace('[{}]'.format(string.punctuation), '')  # noņem pieturzīmes
 tokenizer = get_tokenizer(tokenizer=None, language='lv')  # tokenaizers
@@ -77,10 +88,10 @@ for epoch in range(num_epochs):
 
     print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch + 1, num_epochs, loss.item()))
 
-correct_true = 0
-correct_false = 0
-true_count = 0
-false_count = 0
+correct_generated = 0
+correct_real = 0
+generated_count = 0
+real_count = 0
 
 for text, generated in test_loader:
     out = model(text)
@@ -88,18 +99,18 @@ for text, generated in test_loader:
     is_correct = torch.round(out[0])[0] == generated[0]
 
     if generated[0] == 1:
-        true_count = true_count + 1
+        generated_count = generated_count + 1
     else:
-        false_count = false_count + 1
+        real_count = real_count + 1
 
     if is_correct:
         if generated[0] == 1:
-            correct_true = correct_true + 1
+            correct_generated = correct_generated + 1
         else:
-            correct_false = correct_false + 1
+            correct_real = correct_real + 1
 
-print("True Precision: {:.1f}%\nFalse Precision: {:.1f}%\nOverall precision: {:.1f}%".format(
-    correct_true / true_count * 100,
-    correct_false / false_count * 100,
-    correct_false + correct_true / len(test_loader)
+print("Generated Precision: {:.1f}%\nReal Precision: {:.1f}%\nOverall precision: {:.1f}%".format(
+    correct_generated / generated_count * 100,
+    correct_real / real_count * 100,
+    (correct_real + correct_generated) / len(test_loader) * 100
 ))
