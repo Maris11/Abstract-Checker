@@ -27,14 +27,15 @@ abstracts = abstracts.fillna("")  # nomaina tukšās vērtības ar tukšu string
 abstracts.abstract = abstracts.abstract.str.replace('[{}]'.format(string.punctuation), '')  # noņem pieturzīmes
 tokenizer = get_tokenizer(tokenizer=None, language='lv')  # tokenaizers
 abstract_text = [tokenizer(text) for text in abstracts.abstract]  # atsaukmju teksta tokenēšana
-vocab_text = build_vocab_from_iterator(iter(abstract_text), specials=["<unk>", "<pad>"])  # izveido teksta vārdnīcu
-vocab_text.set_default_index(vocab_text["<unk>"])
-abstract_text = [torch.tensor(vocab_text(tokens)) for tokens in abstract_text]  # pārveido par tenzoriem
-abstract_text = torch.nn.utils.rnn.pad_sequence(abstract_text, padding_value=vocab_text['<pad>'], batch_first=True)
+vocabulary = build_vocab_from_iterator(iter(abstract_text), specials=["<unk>", "<pad>"])  # izveido teksta vārdnīcu
+vocabulary.set_default_index(vocabulary["<unk>"])
+abstract_text = [torch.tensor(vocabulary(tokens)) for tokens in abstract_text]  # pārveido par tenzoriem
+abstract_text = torch.nn.utils.rnn.pad_sequence(abstract_text, padding_value=vocabulary['<pad>'], batch_first=True)
 generated = torch.tensor(abstracts.is_generated, dtype=torch.float)
 
-dataset = TensorDataset(abstract_text, generated)
+torch.save(vocabulary, 'vocabulary.pth')
 
+dataset = TensorDataset(abstract_text, generated)
 train_size = int(0.8 * len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
@@ -42,23 +43,15 @@ train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
-print(vocab_text['saspiešanas'])
-print(len(train_loader))
-print(len(test_loader))
-
-EMBEDDING_SIZE = 5
-VOCAB_LENGTH = len(vocab_text)
-TEXT_SEQUENCE_LENGTH = len(abstract_text[0])
-
 
 class IsGenerated(nn.Module):
-    def __init__(self):
+    def __init__(self, embedding_size, vocab_length, text_sequence_size):
         super().__init__()
 
         self.abs = nn.Sequential(
-            nn.Embedding(VOCAB_LENGTH, EMBEDDING_SIZE),
+            nn.Embedding(vocab_length, embedding_size),
             nn.Flatten(),
-            nn.Linear(in_features=EMBEDDING_SIZE * TEXT_SEQUENCE_LENGTH, out_features=32),
+            nn.Linear(in_features=embedding_size * text_sequence_size, out_features=32),
             nn.ReLU(),
             nn.Linear(in_features=32, out_features=1),
             nn.Sigmoid()
@@ -70,7 +63,9 @@ class IsGenerated(nn.Module):
         return is_generated
 
 
-model = IsGenerated()
+print(len(abstract_text[0]), len(vocabulary))
+
+model = IsGenerated(5, len(vocabulary), len(abstract_text[0]))
 loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 num_epochs = 10
@@ -95,7 +90,6 @@ real_count = 0
 
 for text, generated in test_loader:
     out = model(text)
-
     is_correct = torch.round(out[0])[0] == generated[0]
 
     if generated[0] == 1:
@@ -114,3 +108,6 @@ print("Generated Precision: {:.1f}%\nReal Precision: {:.1f}%\nOverall precision:
     correct_real / real_count * 100,
     (correct_real + correct_generated) / len(test_loader) * 100
 ))
+
+state_dict = model.state_dict()
+torch.save(state_dict, "model.tar")

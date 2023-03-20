@@ -1,0 +1,27 @@
+body {
+    background-color: #052a28;
+}
+
+#input-abstract {
+    background-color: #083d3c;
+    color: white;
+
+}
+
+h1 {
+    color: white
+}
+
+#check-btn {
+    margin-left: 1px;
+}
+
+#response {
+    font-size: 1.5vw;
+    font-weight: bold;
+    border: 1px solid black
+}
+
+#percentage {
+    font-weight: bolder;
+}
