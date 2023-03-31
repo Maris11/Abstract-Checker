@@ -6,26 +6,36 @@ from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader, TensorDataset, random_split
 
-bme_sentences = pd.read_csv(
-    "abstracts/bme_sentences.csv",
+real = pd.read_csv(
+    "abstracts/bme_abstracts_real.csv",
     delimiter=',',
     encoding='utf-8',
-    header=0
+    header=0,
+    usecols=['abstract', 'is_generated']
 )
 
-sentences = bme_sentences.fillna("")  # nomaina tukšās vērtības ar tukšu string
-sentences.sentence = sentences.sentence.str.replace('[{}]'.format(string.punctuation), '')  # noņem pieturzīmes
+generated = pd.read_csv(
+    "abstracts/bme_abstracts_generated.csv",
+    delimiter=',',
+    encoding='utf-8',
+    header=0,
+    usecols=['abstract', 'is_generated']
+)
+
+abstracts = pd.concat([real, generated], axis=0, ignore_index=True)
+abstracts = abstracts.fillna("")  # nomaina tukšās vērtības ar tukšu string
+abstracts.abstract = abstracts.abstract.str.replace('[{}]'.format(string.punctuation), '')  # noņem pieturzīmes
 tokenizer = get_tokenizer(tokenizer=None, language='lv')  # tokenaizers
-sentence_text = [tokenizer(text) for text in sentences.sentence]  # atsaukmju teksta tokenēšana
-vocabulary = build_vocab_from_iterator(iter(sentence_text), specials=["<unk>", "<pad>"])  # izveido teksta vārdnīcu
+abstract_text = [tokenizer(text) for text in abstracts.abstract]  # atsaukmju teksta tokenēšana
+vocabulary = build_vocab_from_iterator(iter(abstract_text), specials=["<unk>", "<pad>"])  # izveido teksta vārdnīcu
 vocabulary.set_default_index(vocabulary["<unk>"])
-sentence_text = [torch.tensor(vocabulary(tokens)) for tokens in sentence_text]  # pārveido par tenzoriem
-sentence_text = torch.nn.utils.rnn.pad_sequence(sentence_text, padding_value=vocabulary['<pad>'], batch_first=True)
-generated = torch.tensor(sentences.is_generated, dtype=torch.float)
+abstract_text = [torch.tensor(vocabulary(tokens)) for tokens in abstract_text]  # pārveido par tenzoriem
+abstract_text = torch.nn.utils.rnn.pad_sequence(abstract_text, padding_value=vocabulary['<pad>'], batch_first=True)
+generated = torch.tensor(abstracts.is_generated, dtype=torch.float)
 
 torch.save(vocabulary, 'vocabulary.pth')
 
-dataset = TensorDataset(sentence_text, generated)
+dataset = TensorDataset(abstract_text, generated)
 train_size = int(0.8 * len(dataset))
 test_size = len(dataset) - train_size
 train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
@@ -52,7 +62,10 @@ class IsGenerated(nn.Module):
 
         return is_generated
 
-model = IsGenerated(5, len(vocabulary), len(sentence_text[0]))
+
+print(len(abstract_text[0]), len(vocabulary))
+
+model = IsGenerated(5, len(vocabulary), len(abstract_text[0]))
 loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 num_epochs = 10

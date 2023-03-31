@@ -11,8 +11,10 @@ file = open('abstracts/bme_abstracts_real.csv', 'a', encoding='utf-8', newline='
 writer = csv.writer(file)
 
 for i in range(100):
-    response = requests.get('https://dspace.lu.lv/dspace/handle/7/72/browse?order=DESC&rpp=20&sort_by=2&etal=-1'
-                            '&offset=' + str(offset) + '&type=dateissued', verify=False)
+    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5283/recent-submissions?'
+    #                        'offset=' + str(offset), verify=False) # 442
+    response = requests.get('https://dspace.lu.lv/dspace/handle/7/72/browse?order=DESC&rpp=20&sort_by=2&etal=-1&'
+                            'offset=' + str(offset) + '&type=dateissued', verify=False)  # 600
     soup = BeautifulSoup(response.text, 'html.parser')
     links_with_title = soup.select('h4>a')
     links = [a['href'] for a in links_with_title]
@@ -31,32 +33,17 @@ for i in range(100):
         else:
             text = abstract.get_text(separator='<').split(sep='<')[0]
 
-        if "Atslēgvārdi" in text:
-            text = text.lower().split("atslēgvārdi")
-            abst = text[0]
-            keys = text[1]
-        elif "Atslēgas vārdi" in text:
-            text = text.lower().split("atslēgas vārdi")
-            abst = text[0]
-            keys = text[1]
-        else:
-            abst = text
-            keys = ''
-
-        abst = abst.replace('\n', '')
-        keys = keys.replace(':', '')
-        keys = keys.replace(' ', '')
+        abst = text.replace('\n', '')
         abstracts.append(abst)
-        keywords.append(keys)
 
     # print(len(titles), titles)
     # print(len(abstracts), abstracts)
     # print(len(keywords), keywords)
 
     for j in range(len(abstracts)):
-        rows.append([row_id, titles[j], abstracts[j], keywords[j], 0])
+        rows.append([row_id, titles[j], abstracts[j], 0])
         row_id = row_id + 1
 
     writer.writerows(rows)
     offset = offset + 20
-    print('{}/{}'.format((i+1)*20, 100*20))
+    print('{}/{}'.format((i + 1) * 20, 100 * 20))
