@@ -5,16 +5,18 @@ import csv
 
 warnings.filterwarnings('ignore', message='Unverified HTTPS request is being made')
 
-offset = 700
+offset = 474
 row_id = 1
-file = open('abstracts/bme_abstracts_real.csv', 'a', encoding='utf-8', newline='\n')
+file = open('abstracts/df_abstracts_real.csv', 'a', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 
 for i in range(100):
+    response = requests.get('https://dspace.lu.lv/dspace/handle/7/5279/recent-submissions?'
+                            'offset=' + str(offset), verify=False)  # 474
     # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5283/recent-submissions?'
-    #                        'offset=' + str(offset), verify=False) # 442
-    response = requests.get('https://dspace.lu.lv/dspace/handle/7/72/browse?order=DESC&rpp=20&sort_by=2&etal=-1&'
-                            'offset=' + str(offset) + '&type=dateissued', verify=False)  # 600
+    #                         'offset=' + str(offset), verify=False)  # 442
+    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/72/browse?order=DESC&rpp=20&sort_by=2&etal=-1&'
+    #                         'offset=' + str(offset) + '&type=dateissued', verify=False)  # 600
     soup = BeautifulSoup(response.text, 'html.parser')
     links_with_title = soup.select('h4>a')
     links = [a['href'] for a in links_with_title]

@@ -38,12 +38,11 @@
         $('#check-btn').click(function() {
             var myString = $('#input-abstract').val();
             $.ajax({
-                url: 'http:/127.0.0.1:8000',
+                url: 'http:/localhost:8000',
                 method: 'POST',
                 data: myString,
                 success: function(response) {
-                    console.log(response)
-                    //$('#percentage').text(response)
+                    $('#percentage').text(response)
                 },
                 error: function(xhr, status, error) {
                     $('#percentage').textContent = error

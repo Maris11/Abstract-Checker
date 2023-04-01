@@ -32,6 +32,7 @@ train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
 
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=1, shuffle=True)
+print(len(train_loader) * 32, len(test_loader))
 
 
 class IsGenerated(nn.Module):
@@ -52,6 +53,8 @@ class IsGenerated(nn.Module):
 
         return is_generated
 
+
+print(len(sentence_text[0]))
 model = IsGenerated(5, len(vocabulary), len(sentence_text[0]))
 loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -89,6 +92,8 @@ for text, generated in test_loader:
             correct_generated = correct_generated + 1
         else:
             correct_real = correct_real + 1
+
+print(correct_generated, correct_real, generated_count, real_count)
 
 print("Generated Precision: {:.1f}%\nReal Precision: {:.1f}%\nOverall precision: {:.1f}%".format(
     correct_generated / generated_count * 100,
