@@ -14,45 +14,50 @@
   <h1 class="text-center mb-4">Vai anotācija ir datorģenerēta?</h1>
 
   <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-7">
       <div class="input-group mb-3">
-          <textarea class="form-control" style="height: 50vh" placeholder="Ievadi anotāciju..." id="input-abstract"></textarea>
+        <textarea class="form-control" style="height: 50vh" placeholder="Ievadi anotāciju..." id="input-abstract">Šī pētījuma anotācija aplūko pārskatījumu par Vispārīgo datu aizsardzības regulu (GDPR) starptautiskā IT uzņēmumā. Pētījums fokusējas uz GDPR ietekmi uz uzņēmuma darbību un praksi, koncentrējoties uz datu aizsardzības pamatprincipiem un to pielietojuma praksē. Pētījuma autors izmantoja kvalitatīvo analīzi, intervijas ar darbiniekiem un dokumentu analīzi, lai apkopotu un analizētu datus. Pētījuma rezultāti atklāj, ka GDPR ieviešana uzņēmumā radīja izmaiņas datu apstrādes praksē, tika uzlabots datu aizsardzības līmenis un pozitīvi ietekmēja uzņēmuma reputāciju. Tomēr izstrādātās politikas un procedūras jāuzlabo, lai pienācīgi saskaņotu likumdošanu un uzņēmuma praksi. Šie rezultāti var palīdzēt citiem IT uzņēmumiem izprast un atjaunot savus datu aizsardzības pasākumus, lai būtu saskaņā ar GDPR prasībām.</textarea>
         <button class="btn btn-primary" type="button" id="check-btn">Pārbaudīt</button>
       </div>
     </div>
   </div>
 
   <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="alert alert-info" role="alert" id="response">
-        Varbūtība, ka anotācija ir ģenerēta: <span id="percentage"></span>
+    <div class="col-md-7">
+      Varbūtība, ka anotācijas teikums ir ģenerēts:
+    </div>
+  </div>
+
+  <div class="row justify-content-center mt-2 mb-3">
+    <div class="col-md-7">
+      <div class="row">
+        <div class="col-auto">
+          0%
+        </div>
+        <div class="col"><div class="row" id="color-scale"></div></div>
+        <div class="col-auto">
+          100%
+        </div>
       </div>
     </div>
   </div>
 
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      Vidējā varbūtība: <span id="average-percentage">-</span> %
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-7" id="sentences">
+        <div class="row text-center border-bottom pb-2">
+            <div class="col-md-1">Nr.</div>
+            <div class="col-md-11">Anotācijas teikums</div>
+        </div>
+    </div>
+  </div>
 </div>
-
-
-<script>
-    $(document).ready(function() {
-        $('#check-btn').click(function() {
-            var myString = $('#input-abstract').val();
-            $.ajax({
-                url: 'http:/127.0.0.1:8000',
-                method: 'POST',
-                data: myString,
-                success: function(response) {
-                    console.log(response)
-                    //$('#percentage').text(response)
-                },
-                error: function(xhr, status, error) {
-                    $('#percentage').textContent = error
-                }
-            });
-        });
-    });
-</script>
-
+<script src="js/app.js"></script>
 </body>
 </html>
 

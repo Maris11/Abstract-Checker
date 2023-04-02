@@ -1,11 +1,13 @@
 body {
     background-color: #052a28;
+    color: white;
 }
 
 #input-abstract {
     background-color: #083d3c;
     color: white;
-
+    text-align: justify;
+    line-height: 1.5;
 }
 
 h1 {
@@ -24,4 +26,16 @@ h1 {
 
 #percentage {
     font-weight: bolder;
+}
+
+#color-scale {
+    height: 20px;
+}
+
+#sentences {
+    color: white;
+}
+
+.scale-color {
+    padding: 0;
 }

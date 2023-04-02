@@ -73,7 +73,6 @@ def predict_sentences(sentences: list) -> list:
         sentence = torch.tensor(vocabulary(tokenizer(sentence)), dtype=torch.long).unsqueeze(0)
         sentence = torch.nn.utils.rnn.pad_sequence(sentence, padding_value=vocabulary['<pad>'], batch_first=True)
         sentence = torch.nn.functional.pad(sentence, (0, 133 - len(sentence[0])), mode='constant')
-        percentages.append(f"{100 * model(sentence).item():.1f}%")
-        # percentages.append(model(sentence).item())
+        percentages.append(f"{100 * model(sentence).item():.1f}")
 
     return percentages
