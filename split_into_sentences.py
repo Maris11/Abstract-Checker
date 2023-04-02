@@ -1,5 +1,4 @@
 import csv
-
 import pandas as pd
 import stanza
 
@@ -7,7 +6,7 @@ stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
 
 real = pd.read_csv(
-    "abstracts/bme_abstracts_real.csv",
+    "abstracts/df_abstracts_real.csv",
     delimiter=',',
     encoding='utf-8',
     header=0,
@@ -15,7 +14,7 @@ real = pd.read_csv(
 )
 
 generated = pd.read_csv(
-    "abstracts/bme_abstracts_generated.csv",
+    "abstracts/df_abstracts_generated.csv",
     delimiter=',',
     encoding='utf-8',
     header=0,
@@ -25,7 +24,7 @@ generated = pd.read_csv(
 abstracts = pd.concat([real, generated], axis=0, ignore_index=True)
 abstracts = abstracts.fillna("")
 
-file = open('abstracts/bme_sentences.csv', 'a', encoding='utf-8', newline='\n')
+file = open('abstracts/df_sentences.csv', 'a', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 
 for i, row in abstracts.iterrows():

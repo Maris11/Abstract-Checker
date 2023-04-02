@@ -49,18 +49,32 @@ $(document).ready(function() {
         $('#sentences').append(row)
     }
 
-    function getColorScale(percent) {
-        // Set the minimum and maximum percentages for the scale
-        var minPercent = 0;
-        var maxPercent = 100;
+    console.log(getColorScale(50))
 
-        // Calculate the color based on the percentage
-        var red = Math.round(255 * (percent - minPercent) / (maxPercent - minPercent));
-        var green = Math.round(255 * (maxPercent - percent) / (maxPercent - minPercent));
-        var blue = 0;
+    function getColorScale(percentage) {
+        const colorStops = [
+            { percent: 0, color: '#1ba21b' },
+            { percent: 20, color: '#7FFF00' },
+            { percent: 50, color: '#FFFF00' },
+            { percent: 80, color: '#FF7F00' },
+            { percent: 100, color: '#FF0000' }
+        ];
 
-        // Return the color as a CSS string
-        return 'rgb(' + red + ', ' + green + ', ' + blue + ')';
+        let color;
+        for (let i = 1; i < colorStops.length; i++) {
+            if (percentage <= colorStops[i].percent) {
+                const prevStop = colorStops[i - 1];
+                const nextStop = colorStops[i];
+                const percentInRange = (percentage - prevStop.percent) / (nextStop.percent - prevStop.percent);
+                const red = Math.floor(parseInt(prevStop.color.slice(1,3), 16) * (1 - percentInRange) + parseInt(nextStop.color.slice(1,3), 16) * percentInRange);
+                const green = Math.floor(parseInt(prevStop.color.slice(3,5), 16) * (1 - percentInRange) + parseInt(nextStop.color.slice(3,5), 16) * percentInRange);
+                const blue = Math.floor(parseInt(prevStop.color.slice(5,7), 16) * (1 - percentInRange) + parseInt(nextStop.color.slice(5,7), 16) * percentInRange);
+                color = `rgb(${red}, ${green}, ${blue})`;
+                break;
+            }
+        }
+
+        return color;
     }
 
     var container = $('#color-scale')

@@ -8,7 +8,7 @@ file = open('abstracts/df_abstracts_real.csv', 'r', encoding='utf-8')
 reader = csv.reader(file)
 titles = []
 rows = list(reader)
-row_id = 712
+row_id = 820
 
 for i in range(row_id - 1, 1996):
     titles.append(rows[i][1])

@@ -13,7 +13,15 @@ bme_sentences = pd.read_csv(
     header=0
 )
 
-sentences = bme_sentences.fillna("")  # nomaina tukšās vērtības ar tukšu string
+df_sentences = pd.read_csv(
+    "abstracts/df_sentences.csv",
+    delimiter=',',
+    encoding='utf-8',
+    header=0
+)
+
+sentences = pd.concat([bme_sentences, df_sentences], axis=0, ignore_index=True)
+sentences = sentences.fillna("")  # nomaina tukšās vērtības ar tukšu string
 sentences.sentence = sentences.sentence.str.replace('[{}]'.format(string.punctuation), '')  # noņem pieturzīmes
 tokenizer = get_tokenizer(tokenizer=None, language='lv')  # tokenaizers
 sentence_text = [tokenizer(text) for text in sentences.sentence]  # atsaukmju teksta tokenēšana
