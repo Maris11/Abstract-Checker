@@ -5,6 +5,7 @@ import pandas as pd
 from torchtext.data.utils import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 from torch.utils.data import DataLoader, TensorDataset, random_split
+device = torch.device('cuda')
 
 bme_sentences = pd.read_csv(
     "abstracts/bme_sentences.csv",
@@ -27,9 +28,9 @@ tokenizer = get_tokenizer(tokenizer=None, language='lv')  # tokenaizers
 sentence_text = [tokenizer(text) for text in sentences.sentence]  # atsaukmju teksta tokenēšana
 vocabulary = build_vocab_from_iterator(iter(sentence_text), specials=["<unk>", "<pad>"])  # izveido teksta vārdnīcu
 vocabulary.set_default_index(vocabulary["<unk>"])
-sentence_text = [torch.tensor(vocabulary(tokens)) for tokens in sentence_text]  # pārveido par tenzoriem
+sentence_text = [torch.tensor(vocabulary(tokens)).to(device) for tokens in sentence_text]  # pārveido par tenzoriem
 sentence_text = torch.nn.utils.rnn.pad_sequence(sentence_text, padding_value=vocabulary['<pad>'], batch_first=True)
-generated = torch.tensor(sentences.is_generated, dtype=torch.float)
+generated = torch.tensor(sentences.is_generated, dtype=torch.float).to(device)
 
 torch.save(vocabulary, 'vocabulary.pth')
 
@@ -63,7 +64,7 @@ class IsGenerated(nn.Module):
 
 
 print(len(sentence_text[0]))
-model = IsGenerated(5, len(vocabulary), len(sentence_text[0]))
+model = IsGenerated(5, len(vocabulary), len(sentence_text[0])).to(device)
 loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 num_epochs = 10
@@ -109,5 +110,4 @@ print("Generated Precision: {:.1f}%\nReal Precision: {:.1f}%\nOverall precision:
     (correct_real + correct_generated) / len(test_loader) * 100
 ))
 
-state_dict = model.state_dict()
-torch.save(state_dict, "model.tar")
+torch.save(model.state_dict(), "model.tar")

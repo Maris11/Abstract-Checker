@@ -7,7 +7,7 @@ import stanza
 
 stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
-
+device = torch.device('cuda')
 
 def application(environ, start_response):
     # Check that the request method is POST
@@ -66,11 +66,12 @@ def predict_sentences(sentences: list) -> list:
     tokenizer = get_tokenizer(tokenizer=None, language='lv')
     model = IsGenerated(5, len(vocabulary), 133)
     model.load_state_dict(torch.load("model.tar"))
+    model = model.to(device)
     percentages = []
 
     for sentence in sentences:
         sentence = sentence.replace('[{}]'.format(string.punctuation), '')
-        sentence = torch.tensor(vocabulary(tokenizer(sentence)), dtype=torch.long).unsqueeze(0)
+        sentence = torch.tensor(vocabulary(tokenizer(sentence)), dtype=torch.long).to(device).unsqueeze(0)
         sentence = torch.nn.utils.rnn.pad_sequence(sentence, padding_value=vocabulary['<pad>'], batch_first=True)
         sentence = torch.nn.functional.pad(sentence, (0, 133 - len(sentence[0])), mode='constant')
         percentages.append(f"{100 * model(sentence).item():.1f}")
