@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    const average = array => array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length;
+    const arrayAverage = array => array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length;
 
     $('#check-btn').click(function() {
         var myString = $('#input-abstract').val();
@@ -10,12 +10,20 @@ $(document).ready(function() {
             success: function(response) {
                 response = JSON.parse(response)
                 removeElementsWithClass('sentence')
+                let average = 0
+                let wordCount = 0
+                let allWordCount = 0
 
                 for(let i = 0; i < response[0].length; i++) {
                     addSentence(i + 1, response[0][i], response[1][i])
+                    wordCount = response[0][i].split(" ").length
+                    allWordCount += wordCount
+                    average += response[1][i] * wordCount
                 }
-                console.log(response[1])
-                $('#average-percentage').text(average(response[1]).toFixed(1))
+
+                average = (average/allWordCount).toFixed(1)
+
+                $('#average-percentage').text(average + '%').css('color', getColorScale(average))
             },
             error: function(xhr, status, error) {
                 $('#percentage').textContent = error
@@ -49,8 +57,6 @@ $(document).ready(function() {
         $('#sentences').append(row)
     }
 
-    console.log(getColorScale(50))
-
     function getColorScale(percentage) {
         const colorStops = [
             { percent: 0, color: '#1ba21b' },
@@ -83,7 +89,7 @@ $(document).ready(function() {
     function createColorScale() {
         for (var i = 0; i <= 100; i++) {
             var color = getColorScale(i);
-            var el = $('<div class="scale-color">').css('background-color', color).css('width', container.width()/101);
+            var el = $('<div class="scale-color">').css('background-color', color).css('width', container.width()/102);
             container.append(el);
         }
     }
