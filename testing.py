@@ -4,6 +4,7 @@ import torch
 from Module import create_data_loader_and_model
 
 device = torch.device('cuda')
+torch.manual_seed(42)
 
 sentences = pd.read_csv(
     "abstracts/test_data.csv",

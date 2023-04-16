@@ -9,6 +9,7 @@ from Module import create_data_loader_and_model
 stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
 device = torch.device('cuda')
+torch.manual_seed(42)
 
 
 def application(environ, start_response):
@@ -49,7 +50,7 @@ def predict_sentences(sentences: list) -> list:
     with open("model.bin", "r") as f:
         seq_size = int(f.read())
 
-    data_loader, model = create_data_loader_and_model(sentences, with_is_generated=False, text_sequence_size=seq_size)
+    data_loader, model = create_data_loader_and_model(sentences, with_is_generated=False, text_sequence_size=seq_size, shuffle=False)
     model.load_state_dict(torch.load("model.tar"))
     model = model.to(device)
 

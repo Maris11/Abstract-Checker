@@ -8,7 +8,7 @@ $(document).ready(function() {
             data: abstract,
             success: function(response) {
                 response = JSON.parse(response)
-                console.log(response[0])
+                console.log(response)
                 removeElementsWithClass('sentence')
                 let average = 0
                 let wordCount = 0

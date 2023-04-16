@@ -8,6 +8,7 @@ from torchtext.data import get_tokenizer
 from torchtext.vocab import build_vocab_from_iterator
 
 device = torch.device('cuda')
+torch.manual_seed(42)
 
 
 class IsGenerated(nn.Module):
@@ -34,7 +35,8 @@ def create_data_loader_and_model(
         save_vocab: bool = False,
         batch_size: int = 1,
         with_is_generated: bool = True,
-        text_sequence_size: int = 0
+        text_sequence_size: int = 0,
+        shuffle: bool = True
 ):
     sentences = sentences.fillna("")  # nomaina tukšās vērtības ar tukšu string
     sentences.sentence = sentences.sentence.str.replace('[{}]'.format(string.punctuation), '')  # noņem pieturzīmes
@@ -67,7 +69,7 @@ def create_data_loader_and_model(
     else:
         dataset = TensorDataset(sentence_text)
 
-    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+    data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
 
     model = IsGenerated(5, len(vocabulary), text_sequence_size if text_sequence_size else len(sentence_text[0])).to(device)
 
