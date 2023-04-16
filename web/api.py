@@ -1,13 +1,15 @@
 import torch
 import json
-from torch import nn
-from torchtext.data.utils import get_tokenizer
+import pandas as pd
 import string
 import stanza
+
+from Module import create_data_loader_and_model
 
 stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
 device = torch.device('cuda')
+
 
 def application(environ, start_response):
     # Check that the request method is POST
@@ -42,38 +44,19 @@ def split_into_sentences(text: string) -> list:
     return sentences
 
 
-class IsGenerated(nn.Module):
-    def __init__(self, embedding_size, vocab_length, text_sequence_size):
-        super().__init__()
-
-        self.abs = nn.Sequential(
-            nn.Embedding(vocab_length, embedding_size),
-            nn.Flatten(),
-            nn.Linear(in_features=embedding_size * text_sequence_size, out_features=32),
-            nn.ReLU(),
-            nn.Linear(in_features=32, out_features=1),
-            nn.Sigmoid()
-        )
-
-    def forward(self, text):
-        is_generated = self.abs(text)
-
-        return is_generated
-
-
 def predict_sentences(sentences: list) -> list:
-    vocabulary = torch.load('vocabulary.pth')
-    tokenizer = get_tokenizer(tokenizer=None, language='lv')
-    model = IsGenerated(5, len(vocabulary), 133)
+    sentences = pd.DataFrame(sentences, columns=['sentence'])
+    with open("model.bin", "r") as f:
+        seq_size = int(f.read())
+
+    data_loader, model = create_data_loader_and_model(sentences, with_is_generated=False, text_sequence_size=seq_size)
     model.load_state_dict(torch.load("model.tar"))
     model = model.to(device)
+
     percentages = []
 
-    for sentence in sentences:
-        sentence = sentence.replace('[{}]'.format(string.punctuation), '')
-        sentence = torch.tensor(vocabulary(tokenizer(sentence)), dtype=torch.long).to(device).unsqueeze(0)
-        sentence = torch.nn.utils.rnn.pad_sequence(sentence, padding_value=vocabulary['<pad>'], batch_first=True)
-        sentence = torch.nn.functional.pad(sentence, (0, 133 - len(sentence[0])), mode='constant')
+    for sentence in data_loader:
+        sentence = sentence[0]
         percentages.append(f"{100 * model(sentence).item():.1f}")
 
     return percentages

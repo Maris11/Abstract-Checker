@@ -1,3 +1,8 @@
 /.idea
 Constants.py
+/abstracts/test_data.csv
+/abstracts/train_data.csv
 /tests
+model.bin
+model.tar
+vocabulary.pth

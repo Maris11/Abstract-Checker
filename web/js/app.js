@@ -1,14 +1,14 @@
 $(document).ready(function() {
-    const arrayAverage = array => array.reduce((a, b) => parseFloat(a) + parseFloat(b)) / array.length;
-
     $('#check-btn').click(function() {
-        var myString = $('#input-abstract').val();
+        let abstract = $('#input-abstract').val();
+
         $.ajax({
             url: 'http:/127.0.0.1:8000',
             method: 'POST',
-            data: myString,
+            data: abstract,
             success: function(response) {
                 response = JSON.parse(response)
+                console.log(response[0])
                 removeElementsWithClass('sentence')
                 let average = 0
                 let wordCount = 0
@@ -24,9 +24,6 @@ $(document).ready(function() {
                 average = (average/allWordCount).toFixed(1)
 
                 $('#average-percentage').text(average + '%').css('color', getColorScale(average))
-            },
-            error: function(xhr, status, error) {
-                $('#percentage').textContent = error
             }
         });
     });
