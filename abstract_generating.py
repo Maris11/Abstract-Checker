@@ -6,18 +6,23 @@ import csv
 
 openai.api_key = Constants.OPENAI_API_KEY
 
-file = open('abstracts/hzf_abstracts_real.csv', 'r', encoding='utf-8')
+faculty = "hzf"
+
+file = open('abstracts/' + faculty + '_abstracts_real.csv', 'r', encoding='utf-8')
 reader = csv.reader(file)
 titles = []
 rows = list(reader)
-row_id = 500
+row_id = 1
 
 for i in range(row_id, 501):
     titles.append(rows[i][1])
 
 file.close()
-file = open('abstracts/hzf_abstracts_generated.csv', 'a', encoding='utf-8', newline='')
+file = open('abstracts/' + faculty + '_abstracts_generated.csv', 'a', encoding='utf-8', newline='')
 writer = csv.writer(file)
+
+if row_id == 1:
+    writer.writerow(['id', 'title', 'abstract', 'is_generated'])
 
 for title in titles:
     print(title)
@@ -31,7 +36,7 @@ for title in titles:
                 model="gpt-3.5-turbo",
                 messages=[
                     {"role": "user",
-                     "content": "Uzraksti anotāciju tēmai \"" + title + "\""
+                     "content": "Write a random abstract for something with a title of \"" + title + "\". Write in Latvian! Write only the abstract and don't mention that it is an abstract"
                      }
                 ]
             )

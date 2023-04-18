@@ -54,11 +54,12 @@ def create_data_loader_and_model(
     sentence_text = [torch.tensor(vocabulary(tokens)).to(device) for tokens in sentence_text]  # pārveido par tenzoriem
     sentence_text = torch.nn.utils.rnn.pad_sequence(sentence_text, padding_value=vocabulary['<pad>'], batch_first=True)
 
-    if text_sequence_size:
+    if text_sequence_size and text_sequence_size > len(sentence_text[0]):
         # sentence_text = torch.nn.functional.pad(sentence_text, (0, text_sequence_size - len(sentence_text[0])), mode='constant')
         ones = torch.ones((sentence_text.shape[0], text_sequence_size - len(sentence_text[0])), dtype=sentence_text.dtype, device=sentence_text.device)
         sentence_text = torch.cat((sentence_text, ones), dim=1)
-
+    elif text_sequence_size and text_sequence_size <= len(sentence_text[0]):
+        sentence_text = sentence_text[:, :text_sequence_size - len(sentence_text[0])]
     else:
         with open("model.bin", "w") as f:
             f.write(str(len(sentence_text[0])))

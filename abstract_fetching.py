@@ -5,14 +5,23 @@ import csv
 
 warnings.filterwarnings('ignore', message='Unverified HTTPS request is being made')
 
-offset = 474
+offset = 157
 row_id = 1
-file = open('abstracts/df_abstracts_real.csv', 'a', encoding='utf-8', newline='\n')
+file = open('abstracts/geo_abstracts_real.csv', 'a', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
+writer.writerow(['id', 'title', 'abstract', 'is_generated'])
 
-for i in range(100):
-    response = requests.get('https://dspace.lu.lv/dspace/handle/7/5279/recent-submissions?'
-                            'offset=' + str(offset), verify=False)  # 474
+for i in range(50):
+    response = requests.get('https://dspace.lu.lv/dspace/handle/7/5282/recent-submissions?'
+                            'offset=' + str(offset), verify=False)  # 157
+    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5281/recent-submissions?'
+    #                         'offset=' + str(offset), verify=False)  # 213
+    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5284/recent-submissions?'
+    #                         'offset=' + str(offset), verify=False)  # 600
+    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5278/recent-submissions?'
+    #                         'offset=' + str(offset), verify=False)  # 164
+    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5279/recent-submissions?'
+    #                         'offset=' + str(offset), verify=False)  # 474
     # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5283/recent-submissions?'
     #                         'offset=' + str(offset), verify=False)  # 442
     # response = requests.get('https://dspace.lu.lv/dspace/handle/7/72/browse?order=DESC&rpp=20&sort_by=2&etal=-1&'
@@ -38,16 +47,11 @@ for i in range(100):
         abst = text.replace('\n', '')
         abstracts.append(abst)
 
-    # print(len(titles), titles)
-    # print(len(abstracts), abstracts)
-    # print(len(keywords), keywords)
-
     for j in range(len(abstracts)):
         rows.append([row_id, titles[j], abstracts[j], 0])
         row_id = row_id + 1
 
     writer.writerows(rows)
     offset = offset + 20
-    print('{}/{}'.format((i + 1) * 20, 100 * 20))
+    print('{}/{}'.format((i + 1) * 20, 50 * 20))
 
-# mod_wsgi-express start-server web/api.py

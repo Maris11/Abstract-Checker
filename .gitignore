@@ -6,3 +6,6 @@ Constants.py
 model.bin
 model.tar
 vocabulary.pth
+/abstracts/sentences
+test_data.csv
+train_data.csv

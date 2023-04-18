@@ -1,17 +1,17 @@
 import csv
 import pandas as pd
 
-faculties = ['bme', 'df', 'hzf']
+faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law']
 
 real = []
 generated = []
 train_pct = 0.8  # 80% for training
 test_pct = 0.2   # 20% for testing
-nrows = 2000
+nrows = 1800
 
 for faculty in faculties:
     faculty_sentences = pd.read_csv(
-        "abstracts/" + faculty + "_sentences_generated.csv",
+        "abstracts/sentences/" + faculty + "_sentences_generated.csv",
         delimiter=',',
         encoding='utf-8',
         header=0,
@@ -19,7 +19,7 @@ for faculty in faculties:
     )
     generated.append(faculty_sentences)
     faculty_sentences = pd.read_csv(
-        "abstracts/" + faculty + "_sentences_real.csv",
+        "abstracts/sentences/" + faculty + "_sentences_real.csv",
         delimiter=',',
         encoding='utf-8',
         header=0,
@@ -40,7 +40,7 @@ test_sentences_generated = generated[split_index:]
 train_sentences = pd.concat([train_sentences_generated, train_sentences_real], axis=0, ignore_index=True)
 test_sentences = pd.concat([test_sentences_generated, test_sentences_real], axis=0, ignore_index=True)
 
-file = open('abstracts/train_data.csv', 'w', encoding='utf-8', newline='\n')
+file = open('train_data.csv', 'w', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 writer.writerow(['sentence', 'is_generated'])
 
@@ -49,7 +49,7 @@ for i, row in train_sentences.iterrows():
 
 file.close()
 
-file = open('abstracts/test_data.csv', 'w', encoding='utf-8', newline='\n')
+file = open('test_data.csv', 'w', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 writer.writerow(['sentence', 'is_generated'])
 

@@ -7,7 +7,7 @@ device = torch.device('cuda')
 torch.manual_seed(42)
 
 sentences = pd.read_csv(
-    "abstracts/train_data.csv",
+    "train_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0
@@ -17,7 +17,7 @@ data_loader, model = create_data_loader_and_model(sentences, save_vocab=True, ba
 
 loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-num_epochs = 10
+num_epochs = 8
 loss = None
 
 for epoch in range(num_epochs):

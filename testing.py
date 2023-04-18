@@ -7,7 +7,7 @@ device = torch.device('cuda')
 torch.manual_seed(42)
 
 sentences = pd.read_csv(
-    "abstracts/test_data.csv",
+    "test_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0
