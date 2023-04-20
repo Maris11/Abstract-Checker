@@ -1,7 +1,7 @@
 import csv
 import pandas as pd
 
-faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law']
+faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
 
 real = []
 generated = []
@@ -45,6 +45,11 @@ writer = csv.writer(file)
 writer.writerow(['sentence', 'is_generated'])
 
 for i, row in train_sentences.iterrows():
+    word_count = len(row.sentence.split())
+
+    if word_count < 10 or word_count > 20:
+        continue
+
     writer.writerow([row.sentence, row.is_generated])
 
 file.close()

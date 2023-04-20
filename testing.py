@@ -16,7 +16,7 @@ sentences = pd.read_csv(
 with open("model.bin", "r") as f:
     seq_size = int(f.read())
 
-data_loader, model = create_data_loader_and_model(sentences, text_sequence_size=seq_size)
+data_loader, model = create_data_loader_and_model(sentences, text_sequence_size=seq_size, embedding_dim=200)
 model.load_state_dict(torch.load("model.tar"))
 model = model.to(device)
 
@@ -27,7 +27,7 @@ real_count = 0
 
 for text, generated in data_loader:
     out = model(text)
-    is_correct = torch.round(out[0])[0] == generated[0]
+    is_correct = torch.round(out[0]) == generated[0]
 
     if generated[0] == 1:
         generated_count = generated_count + 1

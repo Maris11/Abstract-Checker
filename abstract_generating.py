@@ -6,7 +6,7 @@ import csv
 
 openai.api_key = Constants.OPENAI_API_KEY
 
-faculty = "hzf"
+faculty = "ppm"
 
 file = open('abstracts/' + faculty + '_abstracts_real.csv', 'r', encoding='utf-8')
 reader = csv.reader(file)

@@ -5,16 +5,20 @@ import csv
 
 warnings.filterwarnings('ignore', message='Unverified HTTPS request is being made')
 
-offset = 157
+offset = 2500
 row_id = 1
-file = open('abstracts/geo_abstracts_real.csv', 'a', encoding='utf-8', newline='\n')
+file = open('abstracts/ppm_abstracts_real.csv', 'a', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 writer.writerow(['id', 'title', 'abstract', 'is_generated'])
 
 for i in range(50):
-    response = requests.get('https://dspace.lu.lv/dspace/handle/7/5282/recent-submissions?'
-                            'offset=' + str(offset), verify=False)  # 157
-    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5281/recent-submissions?'
+    response = requests.get('https://dspace.lu.lv/dspace/handle/7/4425/recent-submissions?'
+                            'offset=' + str(offset), verify=False)  # 2500
+    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5285/recent-submissions?'
+    #                         'offset=' + str(offset), verify=False)  # 491
+    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5282/recent-submissions?'
+    #                         'offset=' + str(offset), verify=False)  # 157
+    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5281/recent-submissions?'
     #                         'offset=' + str(offset), verify=False)  # 213
     # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5284/recent-submissions?'
     #                         'offset=' + str(offset), verify=False)  # 600

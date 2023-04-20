@@ -5,8 +5,9 @@ import stanza
 stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
 
-faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law']
-real = True
+# faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law']
+faculties = ['med', 'ppm']
+real = False
 
 for faculty in faculties:
     abstracts = pd.read_csv(
