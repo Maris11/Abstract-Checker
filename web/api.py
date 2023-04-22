@@ -47,10 +47,7 @@ def split_into_sentences(text: string) -> list:
 
 def predict_sentences(sentences: list) -> list:
     sentences = pd.DataFrame(sentences, columns=['sentence'])
-    with open("model.bin", "r") as f:
-        seq_size = int(f.read())
-
-    data_loader, model = create_data_loader_and_model(sentences, with_is_generated=False, text_sequence_size=seq_size, shuffle=False)
+    data_loader, model = create_data_loader_and_model(sentences, with_is_generated=False, shuffle=False)
     model.load_state_dict(torch.load("model.tar"))
     model = model.to(device)
 

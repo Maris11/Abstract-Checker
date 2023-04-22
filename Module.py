@@ -1,74 +1,81 @@
-import string
-
+import gc
 import pandas as pd
 import torch
 from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
-from torchtext.data import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
+from transformers import AutoTokenizer, AutoModel
 
 device = torch.device('cuda')
 torch.manual_seed(42)
 
 
 class IsGenerated(nn.Module):
-    def __init__(self, embedding_dim, vocab_size, text_sequence_size):
+    def __init__(self, embedding_dim, hidden_dim):
         super(IsGenerated, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, embedding_dim)
-        self.lstm = nn.LSTM(embedding_dim, text_sequence_size, batch_first=True)
-        self.linear = nn.Linear(text_sequence_size, 1)
+        self.fc1 = nn.Linear(embedding_dim, hidden_dim)
+        self.fc2 = nn.Linear(hidden_dim, 1)
         self.sigmoid = nn.Sigmoid()
+        self.dropout = nn.Dropout(p=0.2)
 
-    def forward(self, sentences):
-        embedded = self.embedding(sentences)
-        output, (hidden, cell) = self.lstm(embedded)
-        last_hidden = hidden[-1]
-        logits = self.linear(last_hidden)
-        logits = self.sigmoid(logits)
-        return logits
-
-
-def remove_punctuation(text):
-    return text.translate(str.maketrans("", "", string.punctuation))
+    def forward(self, x):
+        out = self.fc1(x)
+        out = self.dropout(out)
+        out = self.fc2(out)
+        out = self.sigmoid(out)
+        return out.squeeze()
 
 
 def create_data_loader_and_model(
         sentences: pd.DataFrame,
-        save_vocab: bool = False,
         batch_size: int = 1,
         with_is_generated: bool = True,
-        text_sequence_size: int = 0,
+        text_sequence_size: int = 25,
         shuffle: bool = True,
-        embedding_dim: int = 100
+        bert_model_name: str = "AiLab-IMCS-UL/lvbert"
 ):
-    sentences = sentences.fillna("")
-    sentences.sentence = sentences.sentence.apply(lambda x: remove_punctuation(x))
-    tokenizer = get_tokenizer(tokenizer=None, language='lv')
-    sentence_text = [tokenizer(text) for text in sentences.sentence]
+    # Load pre-trained BERT tokenizer and model
+    tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
+    model = AutoModel.from_pretrained(bert_model_name).to(device)
 
-    if save_vocab:
-        vocabulary = build_vocab_from_iterator(iter(sentence_text),
-                                               specials=["<unk>", "<pad>"])
-        vocabulary.set_default_index(vocabulary["<unk>"])
-        torch.save(vocabulary, 'vocabulary.pth')
-    else:
-        vocabulary = torch.load('vocabulary.pth')
+    # Preprocess input sentences
+    sentence_text = list(sentences.sentence)
 
-    sentence_text = [torch.tensor(vocabulary(tokens)).to(device) for tokens in sentence_text]
-    sentence_text = torch.nn.utils.rnn.pad_sequence(sentence_text, padding_value=vocabulary['<pad>'], batch_first=True)
+    # Tokenize sentences and convert to input IDs
+    input_ids = []
+    attention_masks = []
+    for sentence in sentence_text:
+        encoded_dict = tokenizer.encode_plus(
+            sentence,
+            add_special_tokens=True,
+            max_length=text_sequence_size,
+            truncation=True,
+            padding='max_length',
+            return_attention_mask=True,
+            return_tensors='pt'
+        )
 
-    if not text_sequence_size:
-        with open("model.bin", "w") as f:
-            f.write(str(len(sentence_text[0])))
+        input_ids.append(encoded_dict['input_ids'])
+        attention_masks.append(encoded_dict['attention_mask'])
 
+    # Convert input IDs and attention masks to tensors and move to device
+    input_ids = torch.cat(input_ids, dim=0).to(device)
+    attention_masks = torch.cat(attention_masks, dim=0).to(device)
+
+    gc.collect()
+    torch.cuda.empty_cache()
+    # Compute sentence embeddings using BERT model
+    with torch.no_grad():
+        outputs = model(input_ids, attention_mask=attention_masks)
+        embeddings = outputs[0][:, 0, :]
+
+    # Create dataset and data loader
     if with_is_generated:
-        generated = torch.tensor(sentences.is_generated, dtype=torch.float).to(device)
-        dataset = TensorDataset(sentence_text, generated)
+        generated = torch.tensor(sentences.is_generated.values, dtype=torch.float).to(device)
+        dataset = TensorDataset(embeddings, generated)
     else:
-        dataset = TensorDataset(sentence_text)
+        dataset = TensorDataset(embeddings)
 
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
+    model = IsGenerated(768, text_sequence_size).to(device)
 
-    model = IsGenerated(embedding_dim, len(vocabulary), text_sequence_size if text_sequence_size else len(sentence_text[0])).to(device)
-
-    return data_loader, model.to(device)
+    return data_loader, model

@@ -5,8 +5,7 @@ import stanza
 stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
 
-# faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law']
-faculties = ['med', 'ppm']
+faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
 real = False
 
 for faculty in faculties:

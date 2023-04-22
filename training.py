@@ -3,6 +3,7 @@ import torch.nn as nn
 import pandas as pd
 from Module import create_data_loader_and_model
 
+
 device = torch.device('cuda')
 torch.manual_seed(42)
 
@@ -13,17 +14,17 @@ sentences = pd.read_csv(
     header=0
 )
 
-data_loader, model = create_data_loader_and_model(sentences, save_vocab=True, batch_size=32, embedding_dim=200)
+data_loader, model = create_data_loader_and_model(sentences, batch_size=32)
 
 loss_fn = nn.BCELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-num_epochs = 15
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+num_epochs = 100
 loss = None
 
 for epoch in range(num_epochs):
     for text, generated in data_loader:
         optimizer.zero_grad()
-        prediction = model(text).squeeze()
+        prediction = model(text)
         loss = loss_fn(prediction, generated)
         loss.backward()
         optimizer.step()

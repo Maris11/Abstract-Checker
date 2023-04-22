@@ -7,7 +7,8 @@ real = []
 generated = []
 train_pct = 0.8  # 80% for training
 test_pct = 0.2   # 20% for testing
-nrows = 1800
+nrows_real = 600
+nrows_generated = 1300
 
 for faculty in faculties:
     faculty_sentences = pd.read_csv(
@@ -15,7 +16,7 @@ for faculty in faculties:
         delimiter=',',
         encoding='utf-8',
         header=0,
-        nrows=nrows
+        nrows=nrows_generated
     )
     generated.append(faculty_sentences)
     faculty_sentences = pd.read_csv(
@@ -23,7 +24,7 @@ for faculty in faculties:
         delimiter=',',
         encoding='utf-8',
         header=0,
-        nrows=nrows
+        nrows=nrows_real
     )
     real.append(faculty_sentences)
 
@@ -34,6 +35,7 @@ split_index = int(train_pct * len(real))
 train_sentences_real = real[:split_index]
 test_sentences_real = real[split_index:]
 
+split_index = int(train_pct * len(generated))
 train_sentences_generated = generated[:split_index]
 test_sentences_generated = generated[split_index:]
 
@@ -47,7 +49,7 @@ writer.writerow(['sentence', 'is_generated'])
 for i, row in train_sentences.iterrows():
     word_count = len(row.sentence.split())
 
-    if word_count < 10 or word_count > 20:
+    if word_count < 3:
         continue
 
     writer.writerow([row.sentence, row.is_generated])

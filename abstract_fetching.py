@@ -13,29 +13,12 @@ writer.writerow(['id', 'title', 'abstract', 'is_generated'])
 
 for i in range(50):
     response = requests.get('https://dspace.lu.lv/dspace/handle/7/4425/recent-submissions?'
-                            'offset=' + str(offset), verify=False)  # 2500
-    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5285/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 491
-    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5282/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 157
-    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5281/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 213
-    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5284/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 600
-    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5278/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 164
-    # # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5279/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 474
-    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/5283/recent-submissions?'
-    #                         'offset=' + str(offset), verify=False)  # 442
-    # response = requests.get('https://dspace.lu.lv/dspace/handle/7/72/browse?order=DESC&rpp=20&sort_by=2&etal=-1&'
-    #                         'offset=' + str(offset) + '&type=dateissued', verify=False)  # 600
+                            'offset=' + str(offset), verify=False)
     soup = BeautifulSoup(response.text, 'html.parser')
     links_with_title = soup.select('h4>a')
     links = [a['href'] for a in links_with_title]
     titles = [a.string for a in links_with_title]
     abstracts = []
-    keywords = []
     rows = []
 
     for link in links:
