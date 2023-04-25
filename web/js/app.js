@@ -11,18 +11,13 @@ $(document).ready(function() {
                 console.log(response)
                 removeElementsWithClass('sentence')
                 let average = 0
-                let wordCount = 0
-                let allWordCount = 0
 
                 for(let i = 0; i < response[0].length; i++) {
                     addSentence(i + 1, response[0][i], response[1][i])
-                    wordCount = response[0][i].split(" ").length
-                    allWordCount += wordCount
-                    average += response[1][i] * wordCount
+                    average += parseFloat(response[1][i])
                 }
 
-                average = (average/allWordCount).toFixed(1)
-
+                average = (average/response[0].length).toFixed(1)
                 $('#average-percentage').text(average + '%').css('color', getColorScale(average))
             }
         });

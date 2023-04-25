@@ -1,9 +1,6 @@
 /.idea
 Constants.py
-/abstracts/test_data.csv
-/abstracts/train_data.csv
 /tests
 model.tar
 /abstracts/sentences
-test_data.csv
-train_data.csv
+test_data/train_data.csv

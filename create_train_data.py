@@ -5,10 +5,8 @@ faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
 
 real = []
 generated = []
-train_pct = 0.8  # 80% for training
-test_pct = 0.2   # 20% for testing
-nrows_real = 600
-nrows_generated = 1300
+nrows_real = 700
+nrows_generated = 700
 
 for faculty in faculties:
     faculty_sentences = pd.read_csv(
@@ -31,18 +29,9 @@ for faculty in faculties:
 real = pd.concat(real, axis=0, ignore_index=True)
 generated = pd.concat(generated, axis=0, ignore_index=True)
 
-split_index = int(train_pct * len(real))
-train_sentences_real = real[:split_index]
-test_sentences_real = real[split_index:]
+train_sentences = pd.concat([real, generated], axis=0, ignore_index=True)
 
-split_index = int(train_pct * len(generated))
-train_sentences_generated = generated[:split_index]
-test_sentences_generated = generated[split_index:]
-
-train_sentences = pd.concat([train_sentences_generated, train_sentences_real], axis=0, ignore_index=True)
-test_sentences = pd.concat([test_sentences_generated, test_sentences_real], axis=0, ignore_index=True)
-
-file = open('train_data.csv', 'w', encoding='utf-8', newline='\n')
+file = open('test_data/train_data.csv', 'w', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 writer.writerow(['sentence', 'is_generated'])
 
@@ -52,13 +41,4 @@ for i, row in train_sentences.iterrows():
     if word_count < 3:
         continue
 
-    writer.writerow([row.sentence, row.is_generated])
-
-file.close()
-
-file = open('test_data.csv', 'w', encoding='utf-8', newline='\n')
-writer = csv.writer(file)
-writer.writerow(['sentence', 'is_generated'])
-
-for i, row in test_sentences.iterrows():
     writer.writerow([row.sentence, row.is_generated])
