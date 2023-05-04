@@ -8,7 +8,7 @@ device = torch.device('cuda')
 torch.manual_seed(42)
 
 sentences = pd.read_csv(
-    "test_data/train_data.csv",
+    "data/train_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0
@@ -31,4 +31,4 @@ for epoch in range(num_epochs):
 
     print('Epoch [{}/{}], Loss: {:.4f}'.format(epoch + 1, num_epochs, loss.item()))
 
-torch.save(model.state_dict(), "model.tar")
+torch.save(model.state_dict(), "model.pt")

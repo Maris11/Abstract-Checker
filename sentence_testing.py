@@ -7,14 +7,14 @@ device = torch.device('cuda')
 torch.manual_seed(42)
 
 sentences = pd.read_csv(
-    "test_data/sentence_test_data.csv",
+    "data/sentence_test_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0
 )
 
 data_loader, model = create_data_loader_and_model(sentences)
-model.load_state_dict(torch.load("model.tar"))
+model.load_state_dict(torch.load("model.pt"))
 model = model.to(device)
 
 generated_threshold = 0.5

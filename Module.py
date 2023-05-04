@@ -29,7 +29,7 @@ def create_data_loader_and_model(
         sentences: pd.DataFrame,
         batch_size: int = 1,
         with_is_generated: bool = True,
-        text_sequence_size: int = 25,
+        text_sequence_size: int = 30,
         shuffle: bool = True,
         bert_model_name: str = "AiLab-IMCS-UL/lvbert"
 ):
@@ -42,7 +42,6 @@ def create_data_loader_and_model(
 
     # Tokenize sentences and convert to input IDs
     input_ids = []
-    attention_masks = []
     for sentence in sentence_text:
         encoded_dict = tokenizer.encode_plus(
             sentence,
@@ -50,22 +49,21 @@ def create_data_loader_and_model(
             max_length=text_sequence_size,
             truncation=True,
             padding='max_length',
-            return_attention_mask=True,
             return_tensors='pt'
         )
+        # print(encoded_dict)
 
         input_ids.append(encoded_dict['input_ids'])
-        attention_masks.append(encoded_dict['attention_mask'])
 
-    # Convert input IDs and attention masks to tensors and move to device
-    input_ids = torch.cat(input_ids, dim=0).to(device)
-    attention_masks = torch.cat(attention_masks, dim=0).to(device)
+    # Convert input IDs to tensors and move to device
+    ids = torch.cat(input_ids, dim=0).to(device)
+    del input_ids
 
     gc.collect()
     torch.cuda.empty_cache()
     # Compute sentence embeddings using BERT model
     with torch.no_grad():
-        outputs = model(input_ids, attention_mask=attention_masks)
+        outputs = model(ids)
         embeddings = outputs[0][:, 0, :]
 
     # Create dataset and data loader
