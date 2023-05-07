@@ -5,17 +5,14 @@ from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
 from transformers import AutoTokenizer, AutoModel
 
-device = torch.device('cuda')
-torch.manual_seed(42)
-
 
 class IsGenerated(nn.Module):
     def __init__(self, embedding_dim, hidden_dim):
         super(IsGenerated, self).__init__()
         self.fc1 = nn.Linear(embedding_dim, hidden_dim)
+        self.dropout = nn.Dropout(p=0.2)
         self.fc2 = nn.Linear(hidden_dim, 1)
         self.sigmoid = nn.Sigmoid()
-        self.dropout = nn.Dropout(p=0.1)
 
     def forward(self, x):
         out = self.fc1(x)
@@ -31,8 +28,15 @@ def create_data_loader_and_model(
         with_is_generated: bool = True,
         text_sequence_size: int = 30,
         shuffle: bool = True,
-        bert_model_name: str = "AiLab-IMCS-UL/lvbert"
+        bert_model_name: str = "AiLab-IMCS-UL/lvbert",
+        device: str = torch.device('cuda'),
+        load_model: bool = True,
+        model_path: str = "model.pt",
+        seed: int = 42
 ):
+    if seed:
+        torch.manual_seed(seed)
+
     # Load pre-trained BERT tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
     model = AutoModel.from_pretrained(bert_model_name).to(device)
@@ -51,11 +55,8 @@ def create_data_loader_and_model(
             padding='max_length',
             return_tensors='pt'
         )
-        # print(encoded_dict)
-
         input_ids.append(encoded_dict['input_ids'])
 
-    # Convert input IDs to tensors and move to device
     ids = torch.cat(input_ids, dim=0).to(device)
     del input_ids
 
@@ -75,5 +76,9 @@ def create_data_loader_and_model(
 
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     model = IsGenerated(768, text_sequence_size).to(device)
+
+    if load_model and model_path:
+        model.load_state_dict(torch.load(model_path))
+        model = model.to(device)
 
     return data_loader, model

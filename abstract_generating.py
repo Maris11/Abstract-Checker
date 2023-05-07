@@ -1,5 +1,4 @@
 import time
-
 import openai
 import Constants
 import csv
@@ -7,7 +6,6 @@ import csv
 openai.api_key = Constants.OPENAI_API_KEY
 
 faculty = "ppm"
-
 file = open('abstracts/' + faculty + '_abstracts_real.csv', 'r', encoding='utf-8')
 reader = csv.reader(file)
 titles = []

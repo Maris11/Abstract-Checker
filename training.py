@@ -1,11 +1,7 @@
 import torch
 import torch.nn as nn
 import pandas as pd
-from Module import create_data_loader_and_model
-
-
-device = torch.device('cuda')
-torch.manual_seed(42)
+from model import create_data_loader_and_model
 
 sentences = pd.read_csv(
     "data/train_data.csv",
@@ -14,8 +10,7 @@ sentences = pd.read_csv(
     header=0
 )
 
-data_loader, model = create_data_loader_and_model(sentences, batch_size=32)
-
+data_loader, model = create_data_loader_and_model(sentences, batch_size=32, load_model=False)
 loss_fn = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 num_epochs = 100

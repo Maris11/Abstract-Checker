@@ -2,7 +2,6 @@ import csv
 import pandas as pd
 
 faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
-
 real = []
 generated = []
 nrows_real = 500
@@ -28,9 +27,7 @@ for faculty in faculties:
 
 real = pd.concat(real, axis=0, ignore_index=True)
 generated = pd.concat(generated, axis=0, ignore_index=True)
-
 train_sentences = pd.concat([real, generated], axis=0, ignore_index=True)
-
 file = open('data/train_data.csv', 'w', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 writer.writerow(['sentence', 'is_generated'])

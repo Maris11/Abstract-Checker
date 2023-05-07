@@ -1,38 +1,6 @@
-import torch
 import json
-import pandas as pd
-import string
-import stanza
 import wsgiserver
-from Module import create_data_loader_and_model
-
-
-stanza.download(lang="lv", processors='tokenize')
-nlp = stanza.Pipeline(lang='lv', processors='tokenize')
-device = torch.device('cuda')
-torch.manual_seed(42)
-
-
-def split_into_sentences(text: string) -> list:
-    sentences = nlp(text)
-    sentences = [sentence.text for sentence in sentences.sentences]
-
-    return sentences
-
-
-def predict_sentences(sentences: list) -> list:
-    sentences = pd.DataFrame(sentences, columns=['sentence'])
-    data_loader, model = create_data_loader_and_model(sentences, with_is_generated=False, shuffle=False)
-    model.load_state_dict(torch.load("model.pt"))
-    model = model.to(device)
-
-    percentages = []
-
-    for sentence in data_loader:
-        sentence = sentence[0]
-        percentages.append(f"{100 * model(sentence).item():.1f}")
-
-    return percentages
+from predict_from_abstract import split_into_sentences, predict_sentences
 
 
 def application(environ, start_response):

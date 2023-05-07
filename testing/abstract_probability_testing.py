@@ -1,22 +1,18 @@
 import csv
 import pandas as pd
-import torch
-from web.api import split_into_sentences, predict_sentences
-
-device = torch.device('cuda')
-torch.manual_seed(42)
+from predict_from_abstract import split_into_sentences, predict_sentences
 
 abstracts = pd.read_csv(
-    "test_data/abstract_test_data.csv",
+    "../data/abstract_test_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0,
     usecols=['abstract', 'is_generated']
 )
 
-file_real = open('test_data/test_real_abstract_probabilites.csv', 'w', encoding='utf-8', newline='\n')
+file_real = open('../data/test_real_abstract_probabilites.csv', 'w', encoding='utf-8', newline='\n')
 writer_real = csv.writer(file_real)
-file_generated = open('test_data/test_generated_abstract_probabilites.csv', 'w', encoding='utf-8', newline='\n')
+file_generated = open('../data/test_generated_abstract_probabilites.csv', 'w', encoding='utf-8', newline='\n')
 writer_generated = csv.writer(file_generated)
 
 for i, row in abstracts.iterrows():
