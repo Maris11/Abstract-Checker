@@ -5,12 +5,13 @@ import stanza
 stanza.download(lang="lv", processors='tokenize')
 nlp = stanza.Pipeline(lang='lv', processors='tokenize')
 
+language = 'english'
 faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
-real = False
+real = True
 
 for faculty in faculties:
     abstracts = pd.read_csv(
-        "abstracts/" + faculty + "_abstracts_" + ("real" if real else "generated") + ".csv",
+        "abstracts/" + language + "/" + faculty + "_abstracts_" + ("real" if real else "generated") + ".csv",
         delimiter=',',
         encoding='utf-8',
         header=0,
@@ -19,7 +20,7 @@ for faculty in faculties:
 
     abstracts = abstracts.fillna("")
 
-    file = open("abstracts/sentences/" + faculty + "_sentences_" + ("real" if real else "generated") + ".csv", 'w', encoding='utf-8', newline='\n')
+    file = open("abstracts/" + language + "/sentences/" + faculty + "_sentences_" + ("real" if real else "generated") + ".csv", 'w', encoding='utf-8', newline='\n')
     writer = csv.writer(file)
     writer.writerow(['id', 'sentence', 'is_generated'])
     sentence_id = 1

@@ -1,4 +1,6 @@
 /.idea
 Constants.py
-model.pt
-/abstracts/sentences
+model_latvian.pt
+model_english.pt
+/abstracts/latvian/sentences
+/abstracts/english/sentences

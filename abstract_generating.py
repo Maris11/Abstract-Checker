@@ -5,45 +5,60 @@ import csv
 
 openai.api_key = Constants.OPENAI_API_KEY
 
-faculty = "ppm"
-file = open('abstracts/' + faculty + '_abstracts_real.csv', 'r', encoding='utf-8')
-reader = csv.reader(file)
-titles = []
-rows = list(reader)
-row_id = 1
+faculties = [
+    'bio',
+    'bme',
+    'df',
+    'fmo',
+    'geo',
+    'hzf',
+    'law',
+    'med',
+    'ppm'
+]
+language = Constants.LANGUAGE
 
-for i in range(row_id, 501):
-    titles.append(rows[i][1])
+for faculty in faculties:
+    file = open('abstracts/' + language + '/' + faculty + '_abstracts_real.csv', 'r', encoding='utf-8')
+    reader = csv.reader(file)
+    titles = []
+    rows = list(reader)
+    row_id = 1
 
-file.close()
-file = open('abstracts/' + faculty + '_abstracts_generated.csv', 'a', encoding='utf-8', newline='')
-writer = csv.writer(file)
+    for i in range(row_id, len(rows)):
+        titles.append(rows[i][1])
 
-if row_id == 1:
-    writer.writerow(['id', 'title', 'abstract', 'is_generated'])
+    file.close()
+    file = open('abstracts/' + language + '/' + faculty + '_abstracts_generated.csv', 'a', encoding='utf-8', newline='')
+    writer = csv.writer(file)
 
-for title in titles:
-    print(title)
-    error = True
+    if row_id == 1:
+        writer.writerow(['id', 'title', 'abstract', 'is_generated'])
 
-    while error:
-        error = False
+    for title in titles:
+        print(title)
+        error = True
 
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "user",
-                     "content": "Write a random abstract for something with a title of \"" + title + "\". Write in Latvian! Write only the abstract and don't mention that it is an abstract"
-                     }
-                ]
-            )
-        except openai.error.RateLimitError:
-            time.sleep(10)
-            error = True
+        while error:
+            error = False
 
-    response = response['choices'][0]['message']['content']
-    response = response.replace('\n', '')
-    print(response)
-    writer.writerow([row_id, title, response, 1])
-    row_id = row_id + 1
+            try:
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "user",
+                         "content": "Write a random abstract for something with a title of \"" + title + "\". Write in "
+                                    + language + "! Don't mention the title. "
+                                    "Write only the abstract and don't mention that it is an abstract"
+                         }
+                    ]
+                )
+            except:
+                time.sleep(10)
+                error = True
+
+        response = response['choices'][0]['message']['content']
+        response = response.replace('\n', '')
+        print(response)
+        writer.writerow([row_id, title, response, 1])
+        row_id = row_id + 1

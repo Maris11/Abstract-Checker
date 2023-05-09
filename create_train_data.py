@@ -1,7 +1,19 @@
 import csv
 import pandas as pd
+import Constants
 
-faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
+language = Constants.LANGUAGE
+faculties = [
+    'bio',
+    'bme',
+    'df',
+    'fmo',
+    'geo',
+    'hzf',
+    'law',
+    'med',
+    'ppm'
+]
 real = []
 generated = []
 nrows_real = 500
@@ -9,7 +21,7 @@ nrows_generated = 500
 
 for faculty in faculties:
     faculty_sentences = pd.read_csv(
-        "abstracts/sentences/" + faculty + "_sentences_generated.csv",
+        "abstracts/" + language + "/sentences/" + faculty + "_sentences_generated.csv",
         delimiter=',',
         encoding='utf-8',
         header=0,
@@ -17,7 +29,7 @@ for faculty in faculties:
     )
     generated.append(faculty_sentences)
     faculty_sentences = pd.read_csv(
-        "abstracts/sentences/" + faculty + "_sentences_real.csv",
+        "abstracts/" + language + "/sentences/" + faculty + "_sentences_real.csv",
         delimiter=',',
         encoding='utf-8',
         header=0,
@@ -28,7 +40,7 @@ for faculty in faculties:
 real = pd.concat(real, axis=0, ignore_index=True)
 generated = pd.concat(generated, axis=0, ignore_index=True)
 train_sentences = pd.concat([real, generated], axis=0, ignore_index=True)
-file = open('data/train_data.csv', 'w', encoding='utf-8', newline='\n')
+file = open("data/" + language + "/train_data.csv", 'w', encoding='utf-8', newline='\n')
 writer = csv.writer(file)
 writer.writerow(['sentence', 'is_generated'])
 

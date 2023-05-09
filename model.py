@@ -28,14 +28,16 @@ def create_data_loader_and_model(
         with_is_generated: bool = True,
         text_sequence_size: int = 30,
         shuffle: bool = True,
-        bert_model_name: str = "AiLab-IMCS-UL/lvbert",
+        language: str = "latvian",
         device: str = torch.device('cuda'),
         load_model: bool = True,
-        model_path: str = "model.pt",
+        model_path: str = "model_latvian.pt",
         seed: int = 42
 ):
     if seed:
         torch.manual_seed(seed)
+
+    bert_model_name = "AiLab-IMCS-UL/lvbert" if language == "latvian" else "bert-base-uncased"
 
     # Load pre-trained BERT tokenizer and model
     tokenizer = AutoTokenizer.from_pretrained(bert_model_name)

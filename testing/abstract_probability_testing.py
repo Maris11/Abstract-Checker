@@ -1,18 +1,21 @@
 import csv
 import pandas as pd
+import Constants
 from predict_from_abstract import split_into_sentences, predict_sentences
 
+language = Constants.LANGUAGE
+
 abstracts = pd.read_csv(
-    "../data/abstract_test_data.csv",
+    "../data/" + language + "/abstract_test_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0,
     usecols=['abstract', 'is_generated']
 )
 
-file_real = open('../data/test_real_abstract_probabilites.csv', 'w', encoding='utf-8', newline='\n')
+file_real = open("../data/" + language + "/test_real_abstract_probabilites.csv", 'w', encoding='utf-8', newline='\n')
 writer_real = csv.writer(file_real)
-file_generated = open('../data/test_generated_abstract_probabilites.csv', 'w', encoding='utf-8', newline='\n')
+file_generated = open("../data/" + language + "/test_generated_abstract_probabilites.csv", 'w', encoding='utf-8', newline='\n')
 writer_generated = csv.writer(file_generated)
 
 for i, row in abstracts.iterrows():

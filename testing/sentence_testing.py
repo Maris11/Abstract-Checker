@@ -1,14 +1,17 @@
 import pandas as pd
+import Constants
 from model import create_data_loader_and_model
 
+language = Constants.LANGUAGE
+
 sentences = pd.read_csv(
-    "../data/sentence_test_data.csv",
+    "../data/" + language + "/sentence_test_data.csv",
     delimiter=',',
     encoding='utf-8',
     header=0
 )
 
-data_loader, model = create_data_loader_and_model(sentences, model_path="../model.pt")
+data_loader, model = create_data_loader_and_model(sentences, model_path="../model_" + language + ".pt")
 generated_threshold = 0.5
 tp = 0
 tn = 0

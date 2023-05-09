@@ -1,10 +1,13 @@
+import Constants
+
+language = Constants.LANGUAGE
 generated_threshold = 50
 tp = 0
 tn = 0
 fp = 0
 fn = 0
 
-with open('../data/test_generated_abstract_probabilites.csv', 'r') as file:
+with open("../data/" + language + "/test_generated_abstract_probabilites.csv", 'r') as file:
     for row in file:
         is_correct = float(row) >= generated_threshold
 
@@ -13,7 +16,7 @@ with open('../data/test_generated_abstract_probabilites.csv', 'r') as file:
         else:
             fp = fp + 1
 
-with open('../data/test_real_abstract_probabilites.csv', 'r') as file:
+with open("../data/" + language + "/test_real_abstract_probabilites.csv", 'r') as file:
     for row in file:
         is_correct = float(row) < generated_threshold
 
