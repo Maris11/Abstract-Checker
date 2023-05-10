@@ -19,13 +19,23 @@ file_generated = open("../data/" + language + "/test_generated_abstract_probabil
 writer_generated = csv.writer(file_generated)
 
 for i, row in abstracts.iterrows():
-    sentences = split_into_sentences(row.abstract)
-    probs = predict_sentences(sentences)
-    probs = [float(val) for val in probs]
-    probability = round(sum(probs) / len(probs), 1)
+    sentences = split_into_sentences(row.abstract, language)
+    probs = predict_sentences(sentences, language, model_path="../model_" + language + ".pt")
+    all_word_count = 0
+    average = 0
+    j = 0
+
+    for sentence in sentences:
+        word_count = len(sentence.split())
+        all_word_count = all_word_count + word_count
+        average = average + float(probs[j]) * word_count
+        j = j + 1
+
+    total_probability = round(average / all_word_count, 1)
+
     if row.is_generated:
-        writer_generated.writerow([round(probability, 1)])
+        writer_generated.writerow([total_probability])
     else:
-        writer_real.writerow([round(probability, 1)])
+        writer_real.writerow([total_probability])
 
     print('{}/{}'.format(i + 1, len(abstracts)))

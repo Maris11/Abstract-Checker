@@ -5,13 +5,16 @@ from predict_from_abstract import split_into_sentences, predict_sentences
 
 def application(environ, start_response):
     if environ['REQUEST_METHOD'] != 'POST':
-        start_response('405 Method Not Allowed', [('Content-type', 'text/plain'), ('Access-Control-Allow-Origin', '*')])
+        start_response('405 Method Not Allowed', [('Content-type', 'text/plain')])
         return [b'Only POST requests are allowed.']
 
     request_body = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH'])).decode('utf-8')
-    print(request_body)
-    sentences = split_into_sentences(request_body)
-    percentages = predict_sentences(sentences)
+    request_body = json.loads(request_body)
+    language = request_body[0]
+    abstract = request_body[1]
+    print(language, abstract)
+    sentences = split_into_sentences(abstract, language)
+    percentages = predict_sentences(sentences, language)
     print(percentages)
 
     # Set the response headers

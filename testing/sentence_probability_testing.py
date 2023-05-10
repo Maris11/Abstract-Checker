@@ -12,7 +12,13 @@ sentences = pd.read_csv(
     header=0
 )
 
-data_loader, model = create_data_loader_and_model(sentences, shuffle=False, model_path="../model_latvian.pt")
+data_loader, model = create_data_loader_and_model(
+    sentences,
+    shuffle=False,
+    language=language,
+    model_path="../model_" + language + ".pt"
+)
+
 i = 0
 file_real = open("../data/" + language + "/test_real_sentence_probabilities.csv", 'w', encoding='utf-8', newline='\n')
 writer_real = csv.writer(file_real)

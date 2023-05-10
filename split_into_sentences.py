@@ -1,12 +1,25 @@
 import csv
 import pandas as pd
 import stanza
+import Constants
 
-stanza.download(lang="lv", processors='tokenize')
-nlp = stanza.Pipeline(lang='lv', processors='tokenize')
+language = Constants.LANGUAGE
+
+stanza.download(lang="lv" if language == "latvian" else "en", processors='tokenize')
+nlp = stanza.Pipeline(lang="lv" if language == "latvian" else "en", processors='tokenize')
 
 language = 'english'
-faculties = ['bio', 'bme', 'df', 'fmo', 'geo', 'hzf', 'law', 'med', 'ppm']
+faculties = [
+    'bio',
+    'bme',
+    'df',
+    'fmo',
+    'geo',
+    'hzf',
+    'law',
+    'med',
+    'ppm'
+]
 real = True
 
 for faculty in faculties:

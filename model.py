@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 from torch import nn
 from torch.utils.data import TensorDataset, DataLoader
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoTokenizer, AutoModel, logging
 
 
 class IsGenerated(nn.Module):
@@ -38,16 +38,12 @@ def create_data_loader_and_model(
         torch.manual_seed(seed)
 
     bert_model_name = "AiLab-IMCS-UL/lvbert" if language == "latvian" else "bert-base-uncased"
-
-    # Load pre-trained BERT tokenizer and model
+    logging.set_verbosity_error()
     tokenizer = AutoTokenizer.from_pretrained(bert_model_name)
     model = AutoModel.from_pretrained(bert_model_name).to(device)
-
-    # Preprocess input sentences
     sentence_text = list(sentences.sentence)
-
-    # Tokenize sentences and convert to input IDs
     input_ids = []
+
     for sentence in sentence_text:
         encoded_dict = tokenizer.encode_plus(
             sentence,
@@ -61,15 +57,13 @@ def create_data_loader_and_model(
 
     ids = torch.cat(input_ids, dim=0).to(device)
     del input_ids
-
     gc.collect()
     torch.cuda.empty_cache()
-    # Compute sentence embeddings using BERT model
+
     with torch.no_grad():
         outputs = model(ids)
         embeddings = outputs[0][:, 0, :]
 
-    # Create dataset and data loader
     if with_is_generated:
         generated = torch.tensor(sentences.is_generated.values, dtype=torch.float).to(device)
         dataset = TensorDataset(embeddings, generated)
