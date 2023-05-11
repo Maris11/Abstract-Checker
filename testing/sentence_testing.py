@@ -14,7 +14,7 @@ sentences = pd.read_csv(
 
 data_loader, model = create_data_loader_and_model(
     sentences,
-    language="english",
+    language=language,
     model_path="../model_" + language + ".pt"
 )
 
