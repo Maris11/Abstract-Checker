@@ -7,6 +7,7 @@ stanza.download(lang="en", processors='tokenize')
 stanza.download(lang="lv", processors='tokenize')
 nlp_en = stanza.Pipeline(lang="en", processors='tokenize')
 nlp_lv = stanza.Pipeline(lang="lv", processors='tokenize')
+nlp_langid = stanza.Pipeline(lang="multilingual", processors="langid", langid_lang_subset=["lv", "en"])
 
 
 def split_into_sentences(text: string, language: string) -> list:
@@ -36,3 +37,10 @@ def predict_sentences(sentences: list, language: string, model_path: string = ''
         percentages.append(f"{100 * model(sentence).item():.1f}")
 
     return percentages
+
+
+def get_language(text) -> string:
+    lang = nlp_langid(text).lang
+    print('det lang: ' + lang)
+
+    return "latvian" if lang == 'lv' else "english"

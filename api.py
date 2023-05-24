@@ -1,6 +1,6 @@
 import json
 import wsgiserver
-from predict_from_abstract import split_into_sentences, predict_sentences
+from predict_from_abstract import split_into_sentences, predict_sentences, get_language
 
 
 def application(environ, start_response):
@@ -12,6 +12,10 @@ def application(environ, start_response):
     request_body = json.loads(request_body)
     language = request_body[0]
     abstract = request_body[1]
+
+    if language == "auto":
+        language = get_language(abstract)
+
     print(language, abstract)
     sentences = split_into_sentences(abstract, language)
     percentages = predict_sentences(sentences, language)
@@ -19,7 +23,7 @@ def application(environ, start_response):
 
     # Set the response headers
     status = '200 OK'
-    response_body = json.dumps([sentences, percentages])
+    response_body = json.dumps([sentences, percentages, language])
     response_headers = [('Content-type', 'text/plain'),
                         ('Content-Length', str(len(response_body))),
                         ('Access-Control-Allow-Origin', '*'),
